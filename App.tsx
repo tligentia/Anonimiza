@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import Header from './components/Header';
 import Pseudonymizer from './components/Pseudonymizer';
@@ -6,6 +7,7 @@ import LegalConsent from './components/LegalConsent';
 import AboutModal from './components/AboutModal';
 import ComplianceModal from './components/ComplianceModal';
 import HelpModal from './components/HelpModal';
+import ManualModal from './components/ManualModal';
 import Toast from './components/Toast';
 import { ProcessStatus, PseudonymizationResult, Entity } from './types';
 import { processLocalContent, reversePseudonymization } from './services/localProcessor';
@@ -25,6 +27,7 @@ const App: React.FC = () => {
   const [showAbout, setShowAbout] = useState(false);
   const [showCompliance, setShowCompliance] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showManual, setShowManual] = useState(false);
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error' | 'info'} | null>(null);
 
   useEffect(() => {
@@ -142,6 +145,7 @@ const App: React.FC = () => {
       <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
       <ComplianceModal isOpen={showCompliance} onClose={() => setShowCompliance(false)} />
       <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      <ManualModal isOpen={showManual} onClose={() => setShowManual(false)} />
       
       {toast && (
         <Toast 
@@ -156,6 +160,7 @@ const App: React.FC = () => {
         setMode={handleModeChange} 
         onLogoClick={() => setShowAbout(true)} 
         onHelpClick={() => setShowHelp(true)}
+        onManualClick={() => setShowManual(true)}
       />
       
       <main className="flex-1 min-h-0 overflow-hidden relative">
