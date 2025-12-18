@@ -20,6 +20,7 @@ interface PseudonymizerProps {
   onRestore: (content: string, mapping: Entity[]) => void;
   onReset: () => void;
   setStatus: (status: ProcessStatus) => void;
+  onNotify?: (msg: string, type?: 'success' | 'error' | 'info') => void;
 }
 
 const Pseudonymizer: React.FC<PseudonymizerProps> = ({ 
@@ -28,7 +29,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
   mappingFile, setMappingFile,
   forcedEntities, setForcedEntities, 
   ignoredValues, setIgnoredValues,
-  onProcess, onRestore, onReset, setStatus 
+  onProcess, onRestore, onReset, setStatus, onNotify 
 }) => {
   const [fileName, setFileName] = useState<string | null>(null);
   const [mappingFileName, setMappingFileName] = useState<string | null>(null);
@@ -64,9 +65,20 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
       }
       setInputText(text);
       setStatus(ProcessStatus.IDLE);
+      onNotify?.("Documento cargado correctamente", "success");
     } catch (err) {
-      alert("Error en la lectura del archivo");
+      onNotify?.("Fallo al leer el archivo", "error");
       setStatus(ProcessStatus.IDLE);
+    }
+  };
+
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setInputText(text);
+      onNotify?.("Texto pegado del portapapeles", "info");
+    } catch (err) {
+      onNotify?.("Permiso de portapapeles denegado", "error");
     }
   };
 
@@ -79,11 +91,12 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
       if (Array.isArray(data)) {
         setMappingFile(data);
         setMappingFileName(file.name);
+        onNotify?.("Mapa JSON importado", "success");
       } else {
-        alert("Formato de mapa inválido. Debe ser un array de entidades.");
+        onNotify?.("Formato JSON inválido", "error");
       }
     } catch (err) {
-      alert("Error al leer el mapa JSON");
+      onNotify?.("Error al leer el mapa", "error");
     }
   };
 
@@ -104,6 +117,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
     setNewForcedOrig('');
     setNewForcedPlac('');
     setIgnoredValues(prev => prev.filter(v => v.toLowerCase() !== newForcedOrig.trim().toLowerCase()));
+    onNotify?.("Regla manual añadida", "info");
   };
 
   const removeForced = (idx: number) => {
@@ -112,6 +126,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
 
   const ignoreValue = (value: string) => {
     setIgnoredValues(prev => [...prev, value]);
+    onNotify?.("Entidad excluida", "info");
   };
 
   const unignoreValue = (idx: number) => {
@@ -125,6 +140,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
     a.href = url;
     a.download = name;
     a.click();
+    onNotify?.("Descargando documento...", "success");
   };
 
   const downloadMapping = () => {
@@ -135,6 +151,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
     a.href = url;
     a.download = 'mapa_transformacion.json';
     a.click();
+    onNotify?.("Descargando Mapa JSON", "success");
   };
 
   const toggleExpand = (panel: 'INPUT' | 'OUTPUT' | 'ENTITIES') => {
@@ -144,13 +161,13 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
   return (
     <div className="h-full flex flex-col min-h-0 space-y-4">
       
-      <div className={`flex-[3] min-h-0 grid gap-6 transition-all duration-500 ease-in-out ${expandedPanel === 'ENTITIES' ? 'opacity-10 pointer-events-none translate-y-full' : ''} ${expandedPanel === 'INPUT' ? 'grid-cols-[1fr_0px] overflow-hidden' : expandedPanel === 'OUTPUT' ? 'grid-cols-[0px_1fr] overflow-hidden' : 'grid-cols-1 lg:grid-cols-2'}`}>
+      <div className={`flex-[3.5] min-h-0 grid gap-6 transition-all duration-500 ease-in-out ${expandedPanel === 'ENTITIES' ? 'opacity-10 pointer-events-none translate-y-full' : ''} ${expandedPanel === 'INPUT' ? 'grid-cols-[1fr_0px] overflow-hidden' : expandedPanel === 'OUTPUT' ? 'grid-cols-[0px_1fr] overflow-hidden' : 'grid-cols-1 lg:grid-cols-2'}`}>
         
         {/* PANEL IZQUIERDO: ENTRADA */}
         <div className={`bg-white flex flex-col min-h-0 border border-black shadow-sm transition-all duration-500 overflow-hidden ${expandedPanel === 'OUTPUT' ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
           <div className="h-14 border-b border-black flex items-center justify-between px-6 bg-gray-50 shrink-0">
              <div className="flex items-center space-x-3">
-                <button onClick={() => toggleExpand('INPUT')} className="w-8 h-8 flex items-center justify-center hover:bg-black hover:text-white transition-all border border-gray-200 rounded-sm">
+                <button onClick={() => toggleExpand('INPUT')} className="w-8 h-8 flex items-center justify-center hover:bg-black hover:text-white transition-all border border-gray-200 rounded-sm" title="Expandir área de entrada">
                   <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${expandedPanel === 'INPUT' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                   </svg>
@@ -162,33 +179,48 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
              </div>
              
              <div className="flex items-center space-x-2">
+                <button 
+                  onClick={handlePaste}
+                  className="text-[9px] font-black uppercase bg-white border border-black px-4 py-2 hover:bg-gray-100 transition-all rounded-sm"
+                  title="Pegar desde el portapapeles"
+                >
+                  Pegar
+                </button>
                 {mode === 'REVERT' && (
                   <div className="flex items-center">
                     <input type="file" accept=".json" onChange={handleMappingFileChange} className="hidden" id="mapping-upload" />
                     <label htmlFor="mapping-upload" className={`text-[10px] font-black uppercase cursor-pointer px-4 py-2 border border-black transition-all rounded-sm ${mappingFile ? 'bg-green-600 text-white border-green-700' : 'bg-white text-black hover:bg-black hover:text-white'}`}>
-                      {mappingFile ? 'MAPA CARGADO ✓' : '1. IMPORTAR MAPA'}
+                      {mappingFile ? 'MAPA ✓' : '1. CARGAR MAPA'}
                     </label>
                   </div>
                 )}
-                <input type="file" onChange={handleFileChange} className="hidden" id="file-upload" />
-                <label htmlFor="file-upload" className="text-[10px] font-black uppercase cursor-pointer bg-black text-white px-5 py-2 hover:bg-red-600 transition-all border border-black rounded-sm">
-                  {mode === 'REVERT' ? '2. IMPORTAR TEXTO' : 'IMPORTAR DOCUMENTO'}
+                <input type="file" accept=".pdf,.docx,.txt" onChange={handleFileChange} className="hidden" id="file-upload" />
+                <label htmlFor="file-upload" className="text-[10px] font-black uppercase cursor-pointer bg-black text-white px-5 py-2 hover:bg-red-600 transition-all border border-black rounded-sm" title="Formatos: PDF, DOCX, TXT">
+                  {mode === 'REVERT' ? '2. CARGAR TEXTO' : 'IMPORTAR DOC'}
                 </label>
              </div>
           </div>
-          <textarea
-            className="flex-1 p-10 font-legal resize-none outline-none bg-transparent overflow-y-auto text-black placeholder-gray-300 scrollbar-thin"
-            placeholder={mode === 'ANON' ? "Pegue o importe el texto legal a procesar..." : "Inserte el texto con etiquetas para restaurar..."}
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-          />
+          <div className="flex-1 relative flex flex-col min-h-0 bg-white">
+            <textarea
+              className="flex-1 p-10 font-legal resize-none outline-none bg-transparent overflow-y-auto text-black placeholder-gray-300 scrollbar-thin"
+              placeholder={mode === 'ANON' ? "Pegue el texto o importe PDF/Word/TXT para anonimizar localmente..." : "Inserte el texto anonimizado para restaurar datos originales..."}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+            />
+            <div className="absolute bottom-4 right-6 flex items-center space-x-4">
+               {inputText.length > 0 && (
+                 <button onClick={() => setInputText('')} className="text-[9px] font-black uppercase text-gray-300 hover:text-red-600 transition-colors">Limpiar</button>
+               )}
+               <span className="text-[9px] font-black text-gray-200 uppercase tracking-widest">{inputText.length} caracteres</span>
+            </div>
+          </div>
         </div>
 
         {/* PANEL DERECHO: SALIDA */}
         <div className={`bg-white flex flex-col min-h-0 border border-black shadow-sm transition-all duration-500 overflow-hidden ${expandedPanel === 'INPUT' ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
           <div className="h-14 border-b border-black flex items-center justify-between px-6 bg-gray-50 shrink-0">
              <div className="flex items-center space-x-3">
-                <button onClick={() => toggleExpand('OUTPUT')} className="w-8 h-8 flex items-center justify-center hover:bg-black hover:text-white transition-all border border-gray-200 rounded-sm">
+                <button onClick={() => toggleExpand('OUTPUT')} className="w-8 h-8 flex items-center justify-center hover:bg-black hover:text-white transition-all border border-gray-200 rounded-sm" title="Expandir área de salida">
                   <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${expandedPanel === 'OUTPUT' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                   </svg>
@@ -196,12 +228,14 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
                 <span className="text-[10px] font-black uppercase tracking-widest text-red-600">Resultado Procesado</span>
              </div>
              
-             {/* ÁREA DE ACCIÓN CABECERA DERECHA */}
              <div className="flex items-center space-x-2">
                 {result && (
                   <div className="flex items-center space-x-1.5 mr-3 border-r border-gray-200 pr-3">
                     <button 
-                      onClick={() => navigator.clipboard.writeText(mode === 'ANON' ? result.pseudonymizedText : result.originalText)} 
+                      onClick={() => {
+                        navigator.clipboard.writeText(mode === 'ANON' ? result.pseudonymizedText : result.originalText);
+                        onNotify?.("Copiado al portapapeles", "success");
+                      }} 
                       className="text-[9px] font-black uppercase text-gray-500 hover:text-black px-2 py-1.5 border border-transparent hover:border-gray-200 rounded-sm"
                     >
                       Copiar
@@ -210,7 +244,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
                       <button 
                         onClick={downloadMapping} 
                         className="text-[9px] font-black uppercase text-black border border-black px-3 py-1.5 hover:bg-black hover:text-white transition-all rounded-sm"
-                        title="Descargar Mapa JSON"
+                        title="Necesario para restaurar el texto original más tarde"
                       >
                         MAPA JSON
                       </button>
@@ -225,18 +259,18 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
                 )}
 
                 {mode === 'ANON' ? (
-                  <button onClick={() => onProcess(inputText)} className="bg-red-600 text-white px-8 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all border border-red-600 rounded-sm">
+                  <button onClick={() => onProcess(inputText)} className="bg-red-600 text-white px-8 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all border border-red-600 rounded-sm shadow-sm active:scale-95">
                     {status === ProcessStatus.PROCESSING ? 'PROCESANDO...' : 'PROCESAR'}
                   </button>
                 ) : (
-                  <button onClick={() => onRestore(inputText, mappingFile || [])} disabled={!mappingFile} className={`px-8 py-2 text-[10px] font-black uppercase tracking-widest transition-all border rounded-sm ${!mappingFile ? 'bg-gray-100 cursor-not-allowed text-gray-400 border-gray-200' : 'bg-black text-white hover:bg-red-600 border-black'}`}>
+                  <button onClick={() => onRestore(inputText, mappingFile || [])} disabled={!mappingFile} className={`px-8 py-2 text-[10px] font-black uppercase tracking-widest transition-all border rounded-sm shadow-sm active:scale-95 ${!mappingFile ? 'bg-gray-100 cursor-not-allowed text-gray-400 border-gray-200' : 'bg-black text-white hover:bg-red-600 border-black'}`}>
                     RESTAURAR ORIGINAL
                   </button>
                 )}
              </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-10 font-legal relative bg-white">
+          <div className="flex-1 overflow-y-auto p-10 font-legal relative bg-white selection:bg-red-600 selection:text-white">
             {status === ProcessStatus.PROCESSING && (
               <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center space-y-6 z-50">
                  <div className="w-24 h-1 bg-gray-100 overflow-hidden"><div className="h-full bg-red-600 animate-width"></div></div>
@@ -261,17 +295,17 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
       </div>
 
       {/* PANEL INFERIOR: GESTIÓN DE REGLAS */}
-      <div className={`flex flex-col bg-white border border-black shadow-sm overflow-hidden transition-all duration-500 ease-in-out ${expandedPanel === 'ENTITIES' ? 'flex-[10] mt-0 fixed inset-x-8 bottom-20 top-20 z-40' : 'flex-[1.4] mt-4'}`}>
+      <div className={`flex flex-col bg-white border border-black shadow-sm overflow-hidden transition-all duration-500 ease-in-out ${expandedPanel === 'ENTITIES' ? 'flex-[10] mt-0 fixed inset-x-8 bottom-20 top-20 z-[60]' : 'flex-[1.2] mt-4'}`}>
         <div className="h-12 border-b border-black flex items-center justify-between px-10 bg-gray-100 shrink-0">
            <div className="flex items-center space-x-4">
-              <button onClick={() => toggleExpand('ENTITIES')} className="w-10 h-10 flex items-center justify-center hover:bg-black hover:text-white transition-all rounded-sm">
+              <button onClick={() => toggleExpand('ENTITIES')} className="w-10 h-10 flex items-center justify-center hover:bg-black hover:text-white transition-all rounded-sm" title="Maximizar Inventario">
                 <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${expandedPanel === 'ENTITIES' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 11l7-7 7 7M5 19l7-7 7 7" /></svg>
               </button>
               <span className="text-[11px] font-black uppercase tracking-widest text-black">Inventario de Entidades</span>
            </div>
            <div className="flex items-center space-x-8">
               <div className="flex bg-white border border-gray-300 rounded-sm p-1 overflow-hidden">
-                 <input placeholder="Valor Original" value={newForcedOrig} onChange={e => setNewForcedOrig(e.target.value)} className="text-[10px] font-bold px-3 py-1 outline-none border-r border-gray-100 w-32" />
+                 <input placeholder="Original" value={newForcedOrig} onChange={e => setNewForcedOrig(e.target.value)} className="text-[10px] font-bold px-3 py-1 outline-none border-r border-gray-100 w-32" />
                  
                  <div className="flex items-center border-r border-gray-100 pr-1">
                     <input 
@@ -282,7 +316,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
                     />
                     <button 
                       onClick={generateAutoAlias} 
-                      title="Generar Alias"
+                      title="Generar Alias Aleatorio"
                       className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -293,7 +327,13 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
 
                  <button onClick={addForcedSubstitution} className="bg-black text-white px-4 py-1 text-[10px] font-black uppercase hover:bg-red-600 transition-colors rounded-r-sm">Añadir</button>
               </div>
-              <button onClick={() => { onReset(); setIgnoredValues([]); setForcedEntities([]); setMappingFile(null); setFileName(null); setInputText(''); }} className="text-[10px] font-black uppercase text-gray-400 hover:text-red-600 transition-colors">Reset</button>
+              <button 
+                onClick={() => { onReset(); setIgnoredValues([]); setForcedEntities([]); setMappingFile(null); setFileName(null); setInputText(''); }} 
+                className="text-[10px] font-black uppercase text-gray-400 hover:text-red-600 transition-colors"
+                title="Reinicia todo el entorno de trabajo"
+              >
+                Reset
+              </button>
            </div>
         </div>
 
@@ -317,7 +357,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
               ))}
               {((mode === 'ANON' ? result?.entitiesFound : mappingFile) || []).filter(e => !e.forced).map((entity, idx) => (
                 <div key={`auto-${idx}`} className="flex flex-col p-4 bg-white border border-gray-200 hover:border-black transition-all group relative rounded-sm">
-                   <button onClick={() => ignoreValue(entity.originalValue)} className="absolute -top-2 -right-2 bg-black text-white w-5 h-5 flex items-center justify-center rounded-full text-[8px] font-black opacity-0 group-hover:opacity-100 transition-opacity" title="Ignorar">IGN.</button>
+                   <button onClick={() => ignoreValue(entity.originalValue)} className="absolute -top-2 -right-2 bg-black text-white w-5 h-5 flex items-center justify-center rounded-full text-[8px] font-black opacity-0 group-hover:opacity-100 transition-opacity" title="Ignorar esta entidad">IGN.</button>
                    <span className="text-[8px] font-black uppercase text-gray-400 bg-gray-50 px-2 py-0.5 mb-2 w-fit rounded-sm">{entity.type}</span>
                    <span className="text-[11px] font-black uppercase bg-black text-white px-2 py-1 text-center truncate mb-2 rounded-sm">{entity.placeholder}</span>
                    <span className="text-[12px] font-bold text-gray-800 text-center truncate">{entity.originalValue}</span>

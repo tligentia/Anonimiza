@@ -6,6 +6,8 @@ import Footer from './components/Footer';
 import LegalConsent from './components/LegalConsent';
 import AboutModal from './components/AboutModal';
 import ComplianceModal from './components/ComplianceModal';
+import HelpModal from './components/HelpModal';
+import Toast from './components/Toast';
 import { ProcessStatus, PseudonymizationResult, Entity } from './types';
 import { processLocalContent, reversePseudonymization } from './services/localProcessor';
 
@@ -23,8 +25,9 @@ const App: React.FC = () => {
   const [showLegal, setShowLegal] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showCompliance, setShowCompliance] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [toast, setToast] = useState<{message: string, type: 'success' | 'error' | 'info'} | null>(null);
 
-  // Cargar sesión previa
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -40,7 +43,6 @@ const App: React.FC = () => {
       }
     }
 
-    // Comprobar si se debe mostrar el consentimiento legal al inicio
     const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const hasConsented = localStorage.getItem('anon_core_consent');
     if (!isDev && !hasConsented) {
@@ -48,7 +50,6 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Guardar sesión ante cambios
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
       mode, 
@@ -59,8 +60,15 @@ const App: React.FC = () => {
     }));
   }, [mode, forcedEntities, ignoredValues, inputText, mappingFile]);
 
+  const notify = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ message, type });
+  };
+
   const handleProcess = useCallback(async (content: string) => {
-    if (!content.trim()) return;
+    if (!content.trim()) {
+      notify("El texto está vacío", "error");
+      return;
+    }
     setStatus(ProcessStatus.PROCESSING);
     setError(null);
     
@@ -76,14 +84,19 @@ const App: React.FC = () => {
         mode: 'ANON'
       });
       setStatus(ProcessStatus.COMPLETED);
+      notify("Procesamiento completado con éxito", "success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error de procesamiento");
       setStatus(ProcessStatus.ERROR);
+      notify("Fallo en el procesado local", "error");
     }
   }, [forcedEntities, ignoredValues]);
 
   const handleRestore = useCallback(async (content: string, mapping: Entity[]) => {
-    if (!content.trim() || !mapping.length) return;
+    if (!content.trim() || !mapping.length) {
+      notify("Faltan datos o mapa de restauración", "error");
+      return;
+    }
     setStatus(ProcessStatus.PROCESSING);
     
     const startTime = performance.now();
@@ -99,35 +112,29 @@ const App: React.FC = () => {
       mode: 'REVERT'
     });
     setStatus(ProcessStatus.COMPLETED);
+    notify("Texto original restaurado", "success");
   }, []);
 
   const handleReset = useCallback(() => {
     setStatus(ProcessStatus.IDLE);
     setResult(null);
     setError(null);
+    notify("Sesión reiniciada", "info");
   }, []);
 
   const handleModeChange = useCallback((newMode: 'ANON' | 'REVERT') => {
-    // Lógica de traspaso: Original (ANON) a Anónimo (REVERT)
     if (mode === 'ANON' && newMode === 'REVERT') {
-      if (result?.pseudonymizedText) {
-        setInputText(result.pseudonymizedText);
-      }
-      if (result?.entitiesFound) {
-        // Preservar inventario: el resultado de ANON se convierte en el mapa para REVERT
-        setMappingFile(result.entitiesFound);
-      }
+      if (result?.pseudonymizedText) setInputText(result.pseudonymizedText);
+      if (result?.entitiesFound) setMappingFile(result.entitiesFound);
     } else if (mode === 'REVERT' && newMode === 'ANON') {
-      if (result?.originalText) {
-        setInputText(result.originalText);
-      }
+      if (result?.originalText) setInputText(result.originalText);
     }
     
     setMode(newMode);
-    // Vacía la de resultado
     setResult(null);
     setError(null);
     setStatus(ProcessStatus.IDLE);
+    notify(`Modo ${newMode === 'ANON' ? 'Anonimizar' : 'Restaurar'} activo`, "info");
   }, [mode, result]);
 
   return (
@@ -135,7 +142,22 @@ const App: React.FC = () => {
       <LegalConsent isOpen={showLegal} onClose={() => setShowLegal(false)} />
       <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
       <ComplianceModal isOpen={showCompliance} onClose={() => setShowCompliance(false)} />
-      <Header mode={mode} setMode={handleModeChange} onLogoClick={() => setShowAbout(true)} />
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
+
+      <Header 
+        mode={mode} 
+        setMode={handleModeChange} 
+        onLogoClick={() => setShowAbout(true)} 
+        onHelpClick={() => setShowHelp(true)}
+      />
       
       <main className="flex-1 min-h-0 overflow-hidden relative">
         <div className="container mx-auto px-8 py-4 max-w-screen-2xl h-full flex flex-col min-h-0">
@@ -156,6 +178,7 @@ const App: React.FC = () => {
             onRestore={handleRestore}
             onReset={handleReset}
             setStatus={setStatus}
+            onNotify={notify}
           />
         </div>
       </main>

@@ -1,12 +1,14 @@
+
 import React from 'react';
 
 interface HeaderProps {
   mode: 'ANON' | 'REVERT';
   setMode: (mode: 'ANON' | 'REVERT') => void;
   onLogoClick?: () => void;
+  onHelpClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick }) => {
+const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick, onHelpClick }) => {
   return (
     <header className="bg-white border-b border-gray-200 z-50 shrink-0">
       <div className="container mx-auto px-8 h-16 flex justify-between items-center max-w-screen-2xl">
@@ -14,9 +16,8 @@ const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick }) => {
         <div 
           className="flex items-center space-x-3 cursor-pointer group"
           onClick={onLogoClick}
-          title="Ver información de acceso"
+          title="Ver QR y Acceso Directo"
         >
-          {/* Rombo: Blanco con borde negro y A roja */}
           <div className="w-8 h-8 bg-white border-2 border-black flex items-center justify-center rotate-45 transition-transform group-hover:scale-110">
              <span className="text-red-600 font-black text-sm -rotate-45">A</span>
           </div>
@@ -26,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick }) => {
           </div>
         </div>
 
-        {/* Translator Style Selector: Original - Anónimo */}
+        {/* Translator Style Selector */}
         <div className="flex items-center bg-gray-50 border border-gray-200 p-1 rounded-sm">
           <button 
             onClick={() => setMode('ANON')}
@@ -36,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick }) => {
               : 'text-gray-400 hover:text-black'
             }`}
           >
-            Original
+            Anonimizar
           </button>
           <div className={`px-2 text-black transition-transform duration-300 ease-in-out ${mode === 'REVERT' ? 'rotate-180' : ''}`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,16 +52,25 @@ const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick }) => {
               : 'text-gray-400 hover:text-black'
             }`}
           >
-            Anónimo
+            Restaurar
           </button>
         </div>
 
-        {/* Status Indicators */}
-        <div className="hidden md:flex items-center space-x-6 text-[9px] font-black uppercase tracking-widest">
-           <div className="flex items-center space-x-2">
-              <span className="text-gray-400">System:</span>
-              <span className="text-black">Ready</span>
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+        {/* Action Buttons & Status */}
+        <div className="flex items-center space-x-6">
+           <button 
+             onClick={onHelpClick}
+             className="flex items-center space-x-2 text-[9px] font-black uppercase text-gray-400 hover:text-black transition-colors"
+           >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Ayuda</span>
+           </button>
+           <div className="hidden md:flex items-center space-x-2 text-[9px] font-black uppercase tracking-widest border-l border-gray-100 pl-6">
+              <span className="text-gray-400">Estado:</span>
+              <span className="text-black">En línea</span>
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
            </div>
         </div>
       </div>

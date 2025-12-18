@@ -27,18 +27,24 @@ const BLACKLIST_CAPS = new Set([
   'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'
 ]);
 
+const cleanText = (text: string): string => {
+  return text
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "") // Eliminar caracteres de control no imprimibles
+    .replace(/\r\n/g, "\n")
+    .trim();
+};
+
 export const processLocalContent = async (text: string, forced: Entity[] = [], ignored: string[] = []): Promise<PseudonymizationResult> => {
-  let processedText = text;
+  const sourceText = cleanText(text);
+  let processedText = sourceText;
   const entitiesFound: Entity[] = [...forced];
   const entityMap = new Map<string, string>();
   const counters: Record<string, number> = {};
   const ignoredSet = new Set(ignored.map(i => i.toLowerCase().trim()));
 
-  // Primero registramos las forzadas para evitar colisiones
   forced.forEach(e => {
     entityMap.set(e.originalValue, e.placeholder);
     const typeKey = e.type.split('_')[0];
-    // Ajustamos contadores para que el auto empiece después
     counters[typeKey] = Math.max(counters[typeKey] || 0, 1);
   });
 
@@ -47,7 +53,6 @@ export const processLocalContent = async (text: string, forced: Entity[] = [], i
     if (!trimmedValue || trimmedValue.length < 3) return;
     if (entityMap.has(trimmedValue)) return;
     
-    // Filtro de ignorados
     if (ignoredSet.has(trimmedValue.toLowerCase())) return;
 
     if (type === 'NAME_FULL') {
@@ -74,13 +79,12 @@ export const processLocalContent = async (text: string, forced: Entity[] = [], i
     if (!regex) continue;
     let match;
     regex.lastIndex = 0;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = regex.exec(sourceText)) !== null) {
       const value = (type === 'NAME_HEURISTIC' && match[1]) ? match[1] : match[0];
       addEntity(type, value);
     }
   }
 
-  // Sustitución masiva ordenada por longitud
   const sortedEntities = Array.from(entityMap.entries()).sort((a, b) => b[0].length - a[0].length);
   
   for (const [original, placeholder] of sortedEntities) {
@@ -89,7 +93,7 @@ export const processLocalContent = async (text: string, forced: Entity[] = [], i
     processedText = processedText.replace(pattern, placeholder);
   }
 
-  return { originalText: text, pseudonymizedText: processedText, entitiesFound };
+  return { originalText: sourceText, pseudonymizedText: processedText, entitiesFound };
 };
 
 export const reversePseudonymization = (text: string, map: Entity[]): string => {
@@ -106,6 +110,8 @@ export const reversePseudonymization = (text: string, map: Entity[]): string => 
 
 export const extractTextFromPdf = async (arrayBuffer: ArrayBuffer): Promise<string> => {
   const pdfjsLib = (window as any).pdfjsLib;
+  if (!pdfjsLib) throw new Error("Librería PDF.js no cargada");
+  
   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
   const pdf = await loadingTask.promise;
   let fullText = "";
