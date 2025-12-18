@@ -4,19 +4,24 @@ import React from 'react';
 interface HeaderProps {
   mode: 'ANON' | 'REVERT';
   setMode: (mode: 'ANON' | 'REVERT') => void;
+  onLogoClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ mode, setMode }) => {
+const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick }) => {
   return (
     <header className="bg-white border-b border-gray-200 z-50 shrink-0">
       <div className="container mx-auto px-8 h-16 flex justify-between items-center max-w-screen-2xl">
         {/* Brand */}
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-black flex items-center justify-center rotate-45">
+        <div 
+          className="flex items-center space-x-3 cursor-pointer group"
+          onClick={onLogoClick}
+          title="Ver información de acceso"
+        >
+          <div className="w-8 h-8 bg-black flex items-center justify-center rotate-45 transition-transform group-hover:scale-110">
              <span className="text-white font-black text-sm -rotate-45">A</span>
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-[10px] font-black tracking-widest uppercase">ANON_CORE</span>
+            <span className="text-[10px] font-black tracking-widest uppercase group-hover:text-red-600 transition-colors">ANON_CORE</span>
             <span className="text-[8px] text-red-600 font-bold uppercase tracking-tighter">Local Processor</span>
           </div>
         </div>

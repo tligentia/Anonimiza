@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Pseudonymizer from './components/Pseudonymizer';
 import Footer from './components/Footer';
 import LegalConsent from './components/LegalConsent';
+import AboutModal from './components/AboutModal';
 import { ProcessStatus, PseudonymizationResult, Entity } from './types';
 import { processLocalContent, reversePseudonymization } from './services/localProcessor';
 
@@ -19,6 +20,7 @@ const App: React.FC = () => {
   const [mappingFile, setMappingFile] = useState<Entity[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showLegal, setShowLegal] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   // Cargar sesión previa
   useEffect(() => {
@@ -129,7 +131,8 @@ const App: React.FC = () => {
   return (
     <div className="app-container bg-white text-black flex flex-col h-[100dvh] overflow-hidden">
       <LegalConsent isOpen={showLegal} onClose={() => setShowLegal(false)} />
-      <Header mode={mode} setMode={handleModeChange} />
+      <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      <Header mode={mode} setMode={handleModeChange} onLogoClick={() => setShowAbout(true)} />
       
       <main className="flex-1 min-h-0 overflow-hidden relative">
         <div className="container mx-auto px-8 py-4 max-w-screen-2xl h-full flex flex-col min-h-0">
