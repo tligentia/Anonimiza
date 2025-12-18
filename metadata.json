@@ -1,0 +1,5 @@
+{
+  "name": "Anonimiza",
+  "description": "Anonimización de documentos Word, PDF y Texto de alta velocidad mediante procesamiento local RegEx. Sin envío de datos a servidores externos.",
+  "requestFramePermissions": []
+}
