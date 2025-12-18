@@ -1,0 +1,100 @@
+================================================================================
+ANON_CORE | DOCUMENTACIÓN TÉCNICA Y FUNCIONAL
+================================================================================
+
+1. INTRODUCCIÓN
+--------------------------------------------------------------------------------
+ANON_CORE es una "Estación Documental Jurídica" diseñada para la anonimización y 
+pseudonimización de documentos sensibles (PDF, DOCX, TXT) de forma instantánea 
+y segura. 
+
+La aplicación ha sido concebida bajo el principio de "Privacidad por Diseño", 
+asegurando que el tratamiento de datos personales se realice estrictamente en el 
+entorno local del usuario.
+
+2. FILOSOFÍA DE SEGURIDAD: PROTOCOLO 100% LOCAL
+--------------------------------------------------------------------------------
+A diferencia de otras herramientas de IA o procesamiento de texto, ANON_CORE:
+- NO envía datos a servidores externos.
+- NO utiliza APIs de terceros para el procesamiento de texto.
+- Ejecuta toda la lógica de detección mediante "Edge Computing" (en el navegador).
+- Los archivos se descomponen en la memoria RAM volátil del dispositivo y se 
+  eliminan al cerrar la pestaña o realizar un "Reset".
+- Cumple con los niveles más exigentes de soberanía de datos.
+
+3. MODOS DE OPERACIÓN
+--------------------------------------------------------------------------------
+La aplicación dispone de dos estados operativos conmutables:
+
+A. MODO ORIGINAL (ANON):
+   - Objetivo: Transformar un documento original en una versión protegida.
+   - Proceso: El sistema identifica entidades sensibles y las sustituye por 
+     marcadores técnicos (ej. [NOMBRE_1], [DNI_2]).
+   - Resultado: Genera un texto anonimizado y un "Mapa de Transformación" (JSON).
+
+B. MODO ANÓNIMO (REVERT):
+   - Objetivo: Revertir la anonimización para recuperar los datos originales.
+   - Proceso: Requiere la carga del texto anonimizado y el archivo JSON de 
+     mapeo correspondiente.
+   - Resultado: Restaura íntegramente los valores originales en sus posiciones.
+
+4. FUNCIONALIDADES CLAVE
+--------------------------------------------------------------------------------
+4.1. SOPORTE MULTIFORMATO
+La aplicación integra motores de extracción locales:
+- PDF: Procesado mediante PDF.js (vía ArrayBuffer).
+- DOCX: Procesado mediante Mammoth.js para conversión a texto plano.
+- TXT/Markdown: Lectura directa de flujo de texto.
+
+4.2. IDENTIFICACIÓN AUTOMATIZADA (Motores RegEx)
+El procesador local utiliza patrones complejos para detectar:
+- Emails: Direcciones de correo electrónico estándar.
+- Teléfonos: Formatos españoles e internacionales básicos.
+- Identificadores Legales: DNI, NIE, CIF e IBAN.
+- Fechas: Formatos numéricos (DD/MM/AAAA) y textuales ("12 de enero de 2024").
+- Empresas: Identificación de sociedades (S.L., S.A., S.Coop, etc.).
+- Nombres Propios: Heurística avanzada basada en tratamientos (Sr., D., Dña.) 
+  y patrones de mayúsculas, filtrando palabras comunes del lenguaje jurídico.
+
+4.3. GESTIÓN DEL "INVENTARIO DE ENTIDADES"
+Ubicado en el panel inferior (Vault), permite al usuario:
+- Visualizar: Lista de todos los datos detectados y sus alias.
+- Ignorar: Si el sistema detecta un valor que no es sensible, el usuario puede 
+  hacer clic en "IGN." para restaurarlo en el texto final.
+- Forzar: Permite añadir reglas manuales antes del procesado para asegurar que 
+  términos específicos sean siempre sustituidos por alias personalizados.
+
+4.4. EXPORTACIÓN Y MAPEO
+- Exportar Texto: Descarga el resultado en formato .txt.
+- Mapa JSON: Descarga un inventario estructurado que permite la reversibilidad 
+  del proceso en el futuro, esencial para flujos de trabajo jurídicos donde se 
+  requiere volver al original bajo demanda.
+
+5. CUMPLIMIENTO NORMATIVO (COMPLIANCE)
+--------------------------------------------------------------------------------
+La aplicación está diseñada para ayudar a los profesionales a cumplir con:
+- LOPDGDD: Garantiza los derechos ARSOPOL al permitir un control total sobre 
+  qué datos se anonimizan.
+- RGPD: Cumple el principio de minimización y seguridad al evitar la salida 
+  de datos del entorno del responsable del tratamiento.
+- IA-ACT: Clasificada como sistema de riesgo mínimo/limitado por su naturaleza 
+  de procesamiento determinista y local.
+- RD 729/2023: Alineada con las obligaciones de implementación ética y segura 
+  de tecnologías de automatización en España.
+
+6. INTERFAZ Y EXPERIENCIA DE USUARIO (UX/UI)
+--------------------------------------------------------------------------------
+- Diseño "Brutalista-Moderno": Estética limpia en blanco, negro y rojo.
+- Paneles Expandibles: Permite maximizar el área de entrada, salida o el vault 
+  de entidades según la necesidad del analista.
+- Feedback de Latencia: El footer informa en tiempo real de la velocidad de 
+  procesamiento (generalmente inferior a 500ms).
+- Responsive: Adaptada para su uso en tablets y dispositivos móviles con 
+  controles táctiles optimizados.
+
+7. CRÉDITOS
+--------------------------------------------------------------------------------
+Desarrollado por Jesús de Pablos para Tligent.
+Versión: 25.12B
+Tecnología: React, Tailwind CSS, PDF.js, Mammoth.js.
+================================================================================
