@@ -5,6 +5,7 @@ import Pseudonymizer from './components/Pseudonymizer';
 import Footer from './components/Footer';
 import LegalConsent from './components/LegalConsent';
 import AboutModal from './components/AboutModal';
+import ComplianceModal from './components/ComplianceModal';
 import { ProcessStatus, PseudonymizationResult, Entity } from './types';
 import { processLocalContent, reversePseudonymization } from './services/localProcessor';
 
@@ -21,6 +22,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showLegal, setShowLegal] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showCompliance, setShowCompliance] = useState(false);
 
   // Cargar sesión previa
   useEffect(() => {
@@ -132,6 +134,7 @@ const App: React.FC = () => {
     <div className="app-container bg-white text-black flex flex-col h-[100dvh] overflow-hidden">
       <LegalConsent isOpen={showLegal} onClose={() => setShowLegal(false)} />
       <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      <ComplianceModal isOpen={showCompliance} onClose={() => setShowCompliance(false)} />
       <Header mode={mode} setMode={handleModeChange} onLogoClick={() => setShowAbout(true)} />
       
       <main className="flex-1 min-h-0 overflow-hidden relative">
@@ -157,7 +160,11 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <Footer result={result} onOpenLegal={() => setShowLegal(true)} />
+      <Footer 
+        result={result} 
+        onOpenLegal={() => setShowLegal(true)} 
+        onOpenCompliance={() => setShowCompliance(true)}
+      />
     </div>
   );
 };
