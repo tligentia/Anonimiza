@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface HeaderProps {
@@ -17,8 +16,9 @@ const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick }) => {
           onClick={onLogoClick}
           title="Ver información de acceso"
         >
-          <div className="w-8 h-8 bg-black flex items-center justify-center rotate-45 transition-transform group-hover:scale-110">
-             <span className="text-white font-black text-sm -rotate-45">A</span>
+          {/* Rombo: Blanco con borde negro y A roja */}
+          <div className="w-8 h-8 bg-white border-2 border-black flex items-center justify-center rotate-45 transition-transform group-hover:scale-110">
+             <span className="text-red-600 font-black text-sm -rotate-45">A</span>
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-[10px] font-black tracking-widest uppercase group-hover:text-red-600 transition-colors">ANON_CORE</span>
