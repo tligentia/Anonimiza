@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import Header from './components/Header';
 import Pseudonymizer from './components/Pseudonymizer';
 import Footer from './components/Footer';
+import LegalConsent from './components/LegalConsent';
 import { ProcessStatus, PseudonymizationResult, Entity } from './types';
 import { processLocalContent, reversePseudonymization } from './services/localProcessor';
 
@@ -12,9 +13,12 @@ const App: React.FC = () => {
   const [mode, setMode] = useState<'ANON' | 'REVERT'>('ANON');
   const [status, setStatus] = useState<ProcessStatus>(ProcessStatus.IDLE);
   const [result, setResult] = useState<PseudonymizationResult | null>(null);
+  const [inputText, setInputText] = useState('');
   const [forcedEntities, setForcedEntities] = useState<Entity[]>([]);
   const [ignoredValues, setIgnoredValues] = useState<string[]>([]);
+  const [mappingFile, setMappingFile] = useState<Entity[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showLegal, setShowLegal] = useState(false);
 
   // Cargar sesión previa
   useEffect(() => {
@@ -25,16 +29,31 @@ const App: React.FC = () => {
         if (parsed.mode) setMode(parsed.mode);
         if (parsed.forcedEntities) setForcedEntities(parsed.forcedEntities);
         if (parsed.ignoredValues) setIgnoredValues(parsed.ignoredValues);
+        if (parsed.inputText) setInputText(parsed.inputText);
+        if (parsed.mappingFile) setMappingFile(parsed.mappingFile);
       } catch (e) {
         console.error("Error cargando sesión previa");
       }
+    }
+
+    // Comprobar si se debe mostrar el consentimiento legal al inicio
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const hasConsented = localStorage.getItem('anon_core_consent');
+    if (!isDev && !hasConsented) {
+      setShowLegal(true);
     }
   }, []);
 
   // Guardar sesión ante cambios
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode, forcedEntities, ignoredValues }));
-  }, [mode, forcedEntities, ignoredValues]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ 
+      mode, 
+      forcedEntities, 
+      ignoredValues,
+      inputText,
+      mappingFile
+    }));
+  }, [mode, forcedEntities, ignoredValues, inputText, mappingFile]);
 
   const handleProcess = useCallback(async (content: string) => {
     if (!content.trim()) return;
@@ -44,7 +63,6 @@ const App: React.FC = () => {
     const startTime = performance.now();
     try {
       await new Promise(r => setTimeout(r, 600)); 
-      // Pasar las entidades forzadas y los valores ignorados al procesador
       const data = await processLocalContent(content, forcedEntities, ignoredValues);
       const endTime = performance.now();
       
@@ -86,12 +104,31 @@ const App: React.FC = () => {
   }, []);
 
   const handleModeChange = useCallback((newMode: 'ANON' | 'REVERT') => {
+    // Lógica de traspaso: Original (ANON) a Anónimo (REVERT)
+    if (mode === 'ANON' && newMode === 'REVERT') {
+      if (result?.pseudonymizedText) {
+        setInputText(result.pseudonymizedText);
+      }
+      if (result?.entitiesFound) {
+        // Preservar inventario: el resultado de ANON se convierte en el mapa para REVERT
+        setMappingFile(result.entitiesFound);
+      }
+    } else if (mode === 'REVERT' && newMode === 'ANON') {
+      if (result?.originalText) {
+        setInputText(result.originalText);
+      }
+    }
+    
     setMode(newMode);
-    handleReset();
-  }, [handleReset]);
+    // Vacía la de resultado
+    setResult(null);
+    setError(null);
+    setStatus(ProcessStatus.IDLE);
+  }, [mode, result]);
 
   return (
     <div className="app-container bg-white text-black flex flex-col h-[100dvh] overflow-hidden">
+      <LegalConsent isOpen={showLegal} onClose={() => setShowLegal(false)} />
       <Header mode={mode} setMode={handleModeChange} />
       
       <main className="flex-1 min-h-0 overflow-hidden relative">
@@ -101,6 +138,10 @@ const App: React.FC = () => {
             status={status}
             result={result}
             error={error}
+            inputText={inputText}
+            setInputText={setInputText}
+            mappingFile={mappingFile}
+            setMappingFile={setMappingFile}
             forcedEntities={forcedEntities}
             setForcedEntities={setForcedEntities}
             ignoredValues={ignoredValues}
@@ -113,7 +154,7 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      <Footer result={result} />
+      <Footer result={result} onOpenLegal={() => setShowLegal(true)} />
     </div>
   );
 };

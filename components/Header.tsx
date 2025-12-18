@@ -22,27 +22,27 @@ const Header: React.FC<HeaderProps> = ({ mode, setMode }) => {
         </div>
 
         {/* Translator Style Selector: Original - Anónimo */}
-        <div className="flex items-center bg-gray-100 border border-gray-200 p-1 rounded-sm">
+        <div className="flex items-center bg-gray-50 border border-gray-200 p-1 rounded-sm">
           <button 
             onClick={() => setMode('ANON')}
-            className={`px-6 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`px-6 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all rounded-sm ${
               mode === 'ANON' 
-              ? 'bg-white text-red-600 shadow-sm' 
+              ? 'bg-white text-red-600 border border-gray-200 shadow-sm' 
               : 'text-gray-400 hover:text-black'
             }`}
           >
             Original
           </button>
-          <div className="px-2 text-gray-300">
+          <div className={`px-2 text-black transition-transform duration-300 ease-in-out ${mode === 'REVERT' ? 'rotate-180' : ''}`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </div>
           <button 
             onClick={() => setMode('REVERT')}
-            className={`px-6 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`px-6 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all rounded-sm ${
               mode === 'REVERT' 
-              ? 'bg-white text-black shadow-sm' 
+              ? 'bg-white text-black border border-gray-200 shadow-sm' 
               : 'text-gray-400 hover:text-black'
             }`}
           >
@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ mode, setMode }) => {
         {/* Status Indicators */}
         <div className="hidden md:flex items-center space-x-6 text-[9px] font-black uppercase tracking-widest">
            <div className="flex items-center space-x-2">
-              <span className="text-gray-300">System:</span>
+              <span className="text-gray-400">System:</span>
               <span className="text-black">Ready</span>
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
            </div>
