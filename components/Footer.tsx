@@ -46,15 +46,25 @@ const Footer: React.FC<FooterProps> = ({ result, onOpenLegal, onOpenCompliance }
 
           {/* Col 4: Autor */}
           <div className="flex flex-col items-center justify-center border-r border-gray-100 h-10">
-            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Created by</span>
             <a 
               href="https://jesus.depablos.es/" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-[11px] font-black uppercase text-black hover:text-red-600 transition-all border-b border-red-600 pb-0.5 leading-none"
+              className="text-[11px] font-black uppercase text-black hover:text-red-600 transition-all leading-none mb-1"
             >
-              jesus de Pablos
+              Jesús de Pablos
             </a>
+            <div className="flex items-center space-x-1 leading-none">
+              <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">by</span>
+              <a 
+                href="https://tligent.com/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-[11px] font-black uppercase text-red-600 hover:text-black transition-all border-b border-red-600/30 pb-0"
+              >
+                Tligent
+              </a>
+            </div>
           </div>
 
           {/* Col 5: Protocolo */}
