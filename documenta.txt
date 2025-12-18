@@ -1,10 +1,10 @@
 ================================================================================
-ANON_CORE | DOCUMENTACIÓN TÉCNICA Y FUNCIONAL
+Anonimiza Privado | DOCUMENTACIÓN TÉCNICA Y FUNCIONAL
 ================================================================================
 
 1. INTRODUCCIÓN
 --------------------------------------------------------------------------------
-ANON_CORE es una "Estación Documental Jurídica" diseñada para la anonimización y 
+Anonimiza Privado es una "Estación Documental Jurídica" diseñada para la anonimización y 
 pseudonimización de documentos sensibles (PDF, DOCX, TXT) de forma instantánea 
 y segura. 
 
@@ -14,7 +14,7 @@ entorno local del usuario.
 
 2. FILOSOFÍA DE SEGURIDAD: PROTOCOLO 100% LOCAL
 --------------------------------------------------------------------------------
-A diferencia de otras herramientas de IA o procesamiento de texto, ANON_CORE:
+A diferencia de otras herramientas de IA o procesamiento de texto, Anonimiza Privado:
 - NO envía datos a servidores externos.
 - NO utiliza APIs de terceros para el procesamiento de texto.
 - Ejecuta toda la lógica de detección mediante "Edge Computing" (en el navegador).
@@ -56,7 +56,7 @@ El procesador local utiliza patrones complejos para detectar:
 - Nombres Propios: Heurística avanzada basada en tratamientos (Sr., D., Dña.) 
   y patrones de mayúsculas, filtrando palabras comunes del lenguaje jurídico.
 
-4.3. GESTIÓN DEL "INVENTARIO DE ENTIDADES"
+4.3. GESTIÓN DE LA "TABLA DE CLAVES"
 Ubicado en el panel inferior (Vault), permite al usuario:
 - Visualizar: Lista de todos los datos detectados y sus alias.
 - Ignorar: Si el sistema detecta un valor que no es sensible, el usuario puede 
@@ -85,8 +85,8 @@ La aplicación está diseñada para ayudar a los profesionales a cumplir con:
 6. INTERFAZ Y EXPERIENCIA DE USUARIO (UX/UI)
 --------------------------------------------------------------------------------
 - Diseño "Brutalista-Moderno": Estética limpia en blanco, negro y rojo.
-- Paneles Expandibles: Permite maximizar el área de entrada, salida o el vault 
-  de entidades según la necesidad del analista.
+- Paneles Expandibles: Permite maximizar el área de entrada, salida o la tabla 
+  de claves según la necesidad del analista.
 - Feedback de Latencia: El footer informa en tiempo real de la velocidad de 
   procesamiento (generalmente inferior a 500ms).
 - Responsive: Adaptada para su uso en tablets y dispositivos móviles con 
@@ -95,6 +95,6 @@ La aplicación está diseñada para ayudar a los profesionales a cumplir con:
 7. CRÉDITOS
 --------------------------------------------------------------------------------
 Desarrollado por Jesús de Pablos para Tligent.
-Versión: 25.12B
+Versión: 25.12C
 Tecnología: React, Tailwind CSS, PDF.js, Mammoth.js.
 ================================================================================

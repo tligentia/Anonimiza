@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PseudonymizationResult } from '../types';
 
@@ -93,7 +92,7 @@ const Footer: React.FC<FooterProps> = ({ result, onOpenLegal, onOpenCompliance }
           </svg>
         </button>
         <span className="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] pointer-events-none">
-          v25.12B
+          v25.12C
         </span>
       </div>
     </footer>

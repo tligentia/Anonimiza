@@ -38,6 +38,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
   const [newForcedOrig, setNewForcedOrig] = useState('');
   const [newForcedPlac, setNewForcedPlac] = useState('');
 
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const prevModeRef = useRef(mode);
 
   useEffect(() => {
@@ -73,12 +74,37 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
   };
 
   const handlePaste = async () => {
+    // 1. Verificar si la API existe
+    if (!navigator.clipboard || !navigator.clipboard.readText) {
+      onNotify?.("Tu navegador bloquea el acceso. Usa Ctrl+V directamente.", "info");
+      textAreaRef.current?.focus();
+      return;
+    }
+
     try {
+      // 2. Intentar leer el portapapeles
       const text = await navigator.clipboard.readText();
-      setInputText(text);
-      onNotify?.("Texto pegado del portapapeles", "info");
-    } catch (err) {
-      onNotify?.("Permiso de portapapeles denegado", "error");
+      
+      if (text) {
+        setInputText(text);
+        onNotify?.("Texto pegado con éxito", "success");
+        // Devolver el foco al textarea
+        textAreaRef.current?.focus();
+      } else {
+        onNotify?.("El portapapeles está vacío", "info");
+      }
+    } catch (err: any) {
+      console.warn("Clipboard access error:", err);
+      
+      // 3. Manejo específico de errores
+      if (err.name === 'NotAllowedError') {
+        onNotify?.("Permiso denegado. Habilítalo en el candado de la barra de direcciones o usa Ctrl+V.", "error");
+      } else {
+        onNotify?.("No se pudo acceder al portapapeles. Usa Ctrl+V manualmente.", "info");
+      }
+      
+      // Facilitar el pegado manual enfocando el campo
+      textAreaRef.current?.focus();
     }
   };
 
@@ -182,7 +208,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
                 <button 
                   onClick={handlePaste}
                   className="text-[9px] font-black uppercase bg-white border border-black px-4 py-2 hover:bg-gray-100 transition-all rounded-sm"
-                  title="Pegar desde el portapapeles"
+                  title="Intentar pegar automáticamente"
                 >
                   Pegar
                 </button>
@@ -202,6 +228,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
           </div>
           <div className="flex-1 relative flex flex-col min-h-0 bg-white">
             <textarea
+              ref={textAreaRef}
               className="flex-1 p-10 font-legal resize-none outline-none bg-transparent overflow-y-auto text-black placeholder-gray-300 scrollbar-thin"
               placeholder={mode === 'ANON' ? "Pegue el texto o importe PDF/Word/TXT para anonimizar localmente..." : "Inserte el texto anonimizado para restaurar datos originales..."}
               value={inputText}
@@ -298,10 +325,10 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
       <div className={`flex flex-col bg-white border border-black shadow-sm overflow-hidden transition-all duration-500 ease-in-out ${expandedPanel === 'ENTITIES' ? 'flex-[10] mt-0 fixed inset-x-8 bottom-20 top-20 z-[60]' : 'flex-[1.2] mt-4'}`}>
         <div className="h-12 border-b border-black flex items-center justify-between px-10 bg-gray-100 shrink-0">
            <div className="flex items-center space-x-4">
-              <button onClick={() => toggleExpand('ENTITIES')} className="w-10 h-10 flex items-center justify-center hover:bg-black hover:text-white transition-all rounded-sm" title="Maximizar Inventario">
+              <button onClick={() => toggleExpand('ENTITIES')} className="w-10 h-10 flex items-center justify-center hover:bg-black hover:text-white transition-all rounded-sm" title="Maximizar Tabla">
                 <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${expandedPanel === 'ENTITIES' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 11l7-7 7 7M5 19l7-7 7 7" /></svg>
               </button>
-              <span className="text-[11px] font-black uppercase tracking-widest text-black">Inventario de Entidades</span>
+              <span className="text-[11px] font-black uppercase tracking-widest text-black">Tabla de Claves</span>
            </div>
            <div className="flex items-center space-x-8">
               <div className="flex bg-white border border-gray-300 rounded-sm p-1 overflow-hidden">

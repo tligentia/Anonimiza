@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface LegalConsentProps {
@@ -8,7 +7,7 @@ interface LegalConsentProps {
 
 const LegalConsent: React.FC<LegalConsentProps> = ({ isOpen, onClose }) => {
   const handleAccept = () => {
-    localStorage.setItem('anon_core_consent', 'true');
+    localStorage.setItem('anonimiza_privado_consent', 'true');
     onClose();
   };
 

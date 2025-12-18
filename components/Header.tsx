@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface HeaderProps {
@@ -22,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick, onHelpClick
              <span className="text-red-600 font-black text-sm -rotate-45">A</span>
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-[10px] font-black tracking-widest uppercase group-hover:text-red-600 transition-colors">ANON_CORE</span>
+            <span className="text-[10px] font-black tracking-widest uppercase group-hover:text-red-600 transition-colors">Anonimiza Privado</span>
             <span className="text-[8px] text-red-600 font-bold uppercase tracking-tighter">Local Processor</span>
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import Header from './components/Header';
 import Pseudonymizer from './components/Pseudonymizer';
@@ -11,7 +10,7 @@ import Toast from './components/Toast';
 import { ProcessStatus, PseudonymizationResult, Entity } from './types';
 import { processLocalContent, reversePseudonymization } from './services/localProcessor';
 
-const STORAGE_KEY = 'anon_core_session';
+const STORAGE_KEY = 'anonimiza_privado_session';
 
 const App: React.FC = () => {
   const [mode, setMode] = useState<'ANON' | 'REVERT'>('ANON');
@@ -44,7 +43,7 @@ const App: React.FC = () => {
     }
 
     const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const hasConsented = localStorage.getItem('anon_core_consent');
+    const hasConsented = localStorage.getItem('anonimiza_privado_consent');
     if (!isDev && !hasConsented) {
       setShowLegal(true);
     }
