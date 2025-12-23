@@ -63,7 +63,7 @@ const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
 
         {/* Footer del Modal */}
         <div className="bg-black text-white py-3 px-6 flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-          <span>Versión 25.12C</span>
+          <span>Versión 25.12D</span>
           <span className="text-red-600">Secure Environment</span>
         </div>
 

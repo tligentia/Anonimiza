@@ -95,6 +95,6 @@ La aplicación está diseñada para ayudar a los profesionales a cumplir con:
 7. CRÉDITOS
 --------------------------------------------------------------------------------
 Desarrollado por Jesús de Pablos para Tligent.
-Versión: 25.12C
+Versión: 25.12D
 Tecnología: React, Tailwind CSS, PDF.js, Mammoth.js.
 ================================================================================

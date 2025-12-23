@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { AppMenu } from './AppMenu';
 
 interface HeaderProps {
   mode: 'ANON' | 'REVERT';
@@ -78,10 +78,9 @@ const Header: React.FC<HeaderProps> = ({ mode, setMode, onLogoClick, onHelpClick
               </svg>
               <span>Ayuda</span>
            </button>
-           <div className="hidden md:flex items-center space-x-2 text-[9px] font-black uppercase tracking-widest border-l border-gray-100 pl-6">
-              <span className="text-gray-400">Estado:</span>
-              <span className="text-black">En línea</span>
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+           
+           <div className="border-l border-gray-100 pl-4">
+             <AppMenu />
            </div>
         </div>
       </div>
