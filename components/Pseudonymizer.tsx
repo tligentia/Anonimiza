@@ -328,7 +328,7 @@ const Pseudonymizer: React.FC<PseudonymizerProps> = ({
               <button onClick={() => toggleExpand('ENTITIES')} className="w-10 h-10 flex items-center justify-center hover:bg-black hover:text-white transition-all rounded-sm" title="Maximizar Tabla">
                 <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${expandedPanel === 'ENTITIES' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 11l7-7 7 7M5 19l7-7 7 7" /></svg>
               </button>
-              <span className="text-[11px] font-black uppercase tracking-widest text-black">Tabla de Claves</span>
+              <span className="text-[11px] font-black uppercase tracking-widest text-black">Mapa de Conversiones</span>
            </div>
            <div className="flex items-center space-x-8">
               <div className="flex bg-white border border-gray-300 rounded-sm p-1 overflow-hidden">

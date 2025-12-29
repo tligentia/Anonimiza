@@ -13,87 +13,65 @@ const Footer: React.FC<FooterProps> = ({ result, onOpenLegal, onOpenCompliance }
   const entitiesCount = result?.entitiesFound?.length || 0;
 
   return (
-    <footer className="bg-white text-black z-50 shrink-0 border-t border-black relative">
-      <div className="container mx-auto px-10 h-24 max-w-screen-2xl">
-        <div className="grid grid-cols-5 h-full items-center gap-2">
+    <footer className="bg-white border-t border-gray-200 z-50 shrink-0">
+      <div className="container mx-auto px-6 h-16 max-w-screen-2xl flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+        
+        {/* Left Section: Badges */}
+        <div className="flex items-center space-x-3">
+          <div className="bg-red-50 text-red-700 px-3 py-1.5 rounded-sm border border-red-100 flex items-center shadow-sm">
+            <span>v25.12E</span>
+          </div>
           
-          {/* Col 1: Volumen */}
-          <div className="flex flex-col items-center justify-center border-r border-gray-100 h-10">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Volumen</span>
-            <span className="text-2xl font-bold font-mono text-black leading-none">
-              {wordCount} <span className="text-[10px] text-gray-400 font-sans uppercase font-black">Palabras</span>
-            </span>
+          <div className="bg-green-50 text-green-700 px-3 py-1.5 rounded-sm border border-green-100 flex items-center shadow-sm justify-center">
+            {result?.processingTime ? (
+               <div className="flex items-center space-x-3 px-1">
+                 <div className="flex items-center space-x-1.5">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                    <span>{result.processingTime} ms</span>
+                 </div>
+                 <div className="w-px h-2 bg-green-200"></div>
+                 <span>{wordCount} Palabras</span>
+                 <div className="w-px h-2 bg-green-200"></div>
+                 <span>{entitiesCount} {result.mode === 'REVERT' ? 'Recuperados' : 'Anonimizados'}</span>
+               </div>
+            ) : (
+               <div className="flex items-center space-x-2 px-1 min-w-[100px] justify-center">
+                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                 <span>System Ready</span>
+               </div>
+            )}
           </div>
-
-          {/* Col 2: Protección */}
-          <div className="flex flex-col items-center justify-center border-r border-gray-100 h-10">
-            <span className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">
-              {result?.mode === 'REVERT' ? 'Recuperados' : 'Protegidos'}
-            </span>
-            <span className="text-2xl font-bold font-mono text-black leading-none">
-              {entitiesCount} <span className="text-[10px] text-gray-400 font-sans uppercase font-black">Ítems</span>
-            </span>
-          </div>
-
-          {/* Col 3: Latencia */}
-          <div className="flex flex-col items-center justify-center border-r border-gray-100 h-10">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Latencia</span>
-            <span className="text-2xl font-bold font-mono text-black leading-none">
-              {result?.processingTime || 0} <span className="text-[10px] text-gray-400 font-sans uppercase font-black">ms</span>
-            </span>
-          </div>
-
-          {/* Col 4: Autor */}
-          <div className="flex flex-col items-center justify-center border-r border-gray-100 h-10">
-            <a 
-              href="https://jesus.depablos.es/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-[11px] font-black uppercase text-black hover:text-red-600 transition-all leading-none mb-1"
-            >
-              Jesús de Pablos
-            </a>
-            <div className="flex items-center space-x-1 leading-none">
-              <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">by</span>
-              <a 
-                href="https://tligent.com/" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-[11px] font-black uppercase text-red-600 hover:text-black transition-all border-b border-red-600/30 pb-0"
-              >
-                Tligent
-              </a>
-            </div>
-          </div>
-
-          {/* Col 5: Protocolo */}
-          <div className="flex items-center justify-center">
-            <button 
-              onClick={onOpenCompliance}
-              className="flex items-center space-x-2 bg-gray-50 px-4 py-2 border border-gray-200 rounded-sm hover:border-black hover:bg-white transition-all group"
-            >
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse group-hover:bg-red-600"></div>
-              <span className="text-[10px] font-black uppercase tracking-tighter text-gray-500 group-hover:text-black">100% Local · No Cloud</span>
-            </button>
-          </div>
-
         </div>
-      </div>
-      
-      {/* Versión y Botón Legal abajo a la derecha */}
-      <div className="absolute bottom-3 right-6 flex items-center space-x-3">
-        <button 
-          onClick={onOpenLegal}
-          className="text-gray-300 hover:text-red-600 transition-colors"
-          title="Ver Protocolo Legal"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-          </svg>
-        </button>
-        <span className="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] pointer-events-none">
-          v25.12D
-        </span>
+
+        {/* Right Section: Links & Branding */}
+        <div className="flex items-center space-x-6">
+          <button 
+            onClick={onOpenLegal} 
+            className="text-gray-400 hover:text-black transition-colors hidden sm:block"
+          >
+            Cookies y Privacidad
+          </button>
+          
+          <button 
+            onClick={onOpenCompliance}
+            className="text-blue-600 hover:text-blue-800 transition-colors flex items-center space-x-2 group"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 group-hover:rotate-90 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Protocolo</span>
+            <span className="text-blue-600">✓</span>
+          </button>
+
+          <div className="h-4 w-px bg-gray-200 mx-2 hidden sm:block"></div>
+
+          <div className="flex items-center space-x-1 hidden sm:flex">
+             <a href="https://jesus.depablos.es/" target="_blank" className="font-black text-black hover:text-red-600 transition-colors">Jesús de Pablos</a>
+             <span className="text-gray-300">/</span>
+             <a href="https://tligent.com/" target="_blank" className="font-black text-black hover:text-red-600 transition-colors">Tligent</a>
+          </div>
+        </div>
       </div>
     </footer>
   );
